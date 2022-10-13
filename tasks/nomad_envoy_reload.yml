@@ -1,0 +1,5 @@
+- name: Nomad envoy reload
+  ansible.builtin.service:
+    name: nomad_envoy
+    state: restarted
+    enabled: true
