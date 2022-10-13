@@ -1,0 +1,82 @@
+- name: Vault Manage
+  include: vault.yml
+  when: nomad_docker_enable | bool
+
+- name: ACL Manage
+  include: acl.yml
+
+- name: Server configuration
+  template:
+    src: server.hcl.j2
+    dest: "{{ nomad_config_dir }}/server.hcl"
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - _nomad_node_server | bool
+  notify:
+    - restart nomad
+
+- name: Nomad configuration
+  template:
+    src: nomad/nomad.sh.erb
+    dest: /etc/profile.d/server.hcl
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Noamd service
+  template:
+    src: nomad/nomad.systemd.erb
+    dest: /lib/systemd/system/nomad.service
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - _nomad_node_server | bool
+  notify:
+    - restart nomad
+
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ nomad_user }}"
+    group: "{{ nomad_group }}"
+  with_items:
+    - "{{ nomad_data_dir }}"
+    - "{{ nomad_plugin_dir }}"
+
+
+- name: Create File
+  file:
+    path: "{{ item }}"
+    state: file
+    owner: "{{ nomad_user }}"
+    group: "{{ nomad_group }}"
+  with_items:
+    - "{{ config.json }}"
+  when:
+    - _nomad_node_server | bool
+  notify:
+    - restart nomad
+
+- name: Unarchive a file that needs to be downloaded (added in 2.0)
+  ansible.builtin.unarchive:
+    src: ${download_url}/${archive_name}
+    dest: /tmp/${archive_name}
+    remote_src: yes
+
+- name: create vault directory
+  file:
+    path: $dir
+    state: directory
+    owner: root
+    group: root
+
+- name: Config
+  template:
+    src: nomad/nomad.envoy.yaml.erb
+    owner: root
+    group: root
+    mode: 0644

@@ -7,13 +7,13 @@
     state: present
   with_items: "{{ nomad_os_packages }}"
   tags: installation
-  when: not ansible_facts['os_family'] == "VMware Photon OS"
+  #when: not ansible_facts['os_family'] == "VMware Photon OS"
 
 - name: Install OS packages
   command: "tdnf install {{ item }}"
   with_items: "{{ nomad_os_packages }}"
   tags: installation
-  when: ansible_facts['os_family'] == "VMware Photon OS"
+  #when: ansible_facts['os_family'] == "VMware Photon OS"
 
 - name: Check Nomad package checksum file
   stat:
@@ -22,35 +22,14 @@
   run_once: true
   tags: installation
   register: nomad_checksum
-  delegate_to: 127.0.0.1
-
-- name: Get Nomad package checksum file
-  get_url:
-    url: "{{ nomad_checksum_file_url }}"
-    dest: "{{ role_path }}/files/nomad_{{ nomad_version }}_SHA256SUMS"
-  become: false
-  run_once: true
-  tags: installation
-  when: not nomad_checksum.stat.exists
-  delegate_to: 127.0.0.1
-
-- name: Get Nomad package checksum
-  shell: |
-    set -o pipefail
-    grep "{{ nomad_pkg }}" "{{ role_path }}/files/nomad_{{ nomad_version }}_SHA256SUMS"  | awk '{print $1}'
-  args:
-    executable: /bin/bash
-  become: false
-  register: nomad_sha256
-  tags: installation
-  delegate_to: 127.0.0.1
+  #delegate_to: 127.0.0.1
 
 - name: Check Nomad package file
   stat:
     path: "{{ role_path }}/files/{{ nomad_pkg }}"
   become: false
   register: nomad_package
-  delegate_to: 127.0.0.1
+  #delegate_to: 127.0.0.1
 
 - name: Download Nomad
   get_url:
@@ -60,7 +39,7 @@
     timeout: "42"
   become: false
   tags: installation
-  delegate_to: 127.0.0.1
+  #delegate_to: 127.0.0.1
   when: not nomad_package.stat.exists
 
 - name: Create Temporary Directory for Extraction
@@ -70,7 +49,7 @@
   become: false
   register: install_temp
   tags: installation
-  delegate_to: 127.0.0.1
+  #delegate_to: 127.0.0.1
 
 - name: Unarchive Nomad
   unarchive:
@@ -79,7 +58,7 @@
     creates: "{{ install_temp.path }}/nomad"
   become: false
   tags: installation
-  delegate_to: 127.0.0.1
+  #delegate_to: 127.0.0.1
 
 - name: Install Nomad
   copy:
@@ -96,4 +75,4 @@
     state: "absent"
   become: false
   tags: installation
-  delegate_to: 127.0.0.1
+  #delegate_to: 127.0.0.1

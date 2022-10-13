@@ -1,0 +1,14 @@
+---
+
+- name: copy nomad config
+  copy:
+    src: nomad.hcl
+    dest: /etc/nomad.d/nomad.hcl
+  register: nomad_config
+
+- name: restart nomad
+  when: nomad_config.changed
+  service:
+    name: nomad
+    state: restarted
+    enabled: yes
