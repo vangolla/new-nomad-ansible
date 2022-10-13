@@ -1,0 +1,7 @@
+- name: Cleanup
+  file:
+    path: "{{ install_temp.path }}"
+    state: "absent"
+  become: false
+  tags: installation
+  delegate_to: 127.0.0.1

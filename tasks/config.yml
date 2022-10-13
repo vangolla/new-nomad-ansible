@@ -80,3 +80,9 @@
     owner: root
     group: root
     mode: 0644
+
+- name: Start Nomad
+  service:
+    name: nomad
+    enabled: true
+    state: started
