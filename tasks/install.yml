@@ -92,3 +92,9 @@
     owner: "{{ nomad_user }}"
     group: "{{ nomad_group }}"
     mode: 0755
+    #################
+    - name: Add repository
+  ansible.builtin.yum_repository:
+    name: epel
+    description: EPEL YUM repo
+    baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
