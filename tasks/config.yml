@@ -86,3 +86,14 @@
     name: nomad
     enabled: true
     state: started
+    
+# - name: create directory if they don't exist
+#   file:
+#     path: "{{ item }}"
+#     state: directory
+#     owner: root
+#     group: root
+#     mode: 0775
+#   loop:
+#     - /data/directory
+#     - /data/another
